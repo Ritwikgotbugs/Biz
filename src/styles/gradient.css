@@ -1,0 +1,117 @@
+
+.animated-bg-gradient {
+  background: linear-gradient(-45deg, #a78bfa, #8b5cf6, #c4b5fd, #8b5cf6);
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+.animated-bg-gradient-soft {
+  background: linear-gradient(-45deg, rgba(167, 139, 250, 0.8), rgba(139, 92, 246, 0.8), rgba(196, 181, 253, 0.8), rgba(139, 92, 246, 0.8));
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+.card-gradient {
+  background: linear-gradient(135deg, #ffffff, #f9fafb);
+}
+
+.card-gradient-primary {
+  background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+}
+
+.card-gradient-secondary {
+  background: linear-gradient(135deg, #fdf4ff, #fae8ff);
+}
+
+.card-gradient-accent {
+  background: linear-gradient(135deg, #ffe4e6, #fecdd3);
+}
+
+.card-gradient-info {
+  background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-gradient-vibrant {
+  background: linear-gradient(90deg, #d946ef, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+.button-gradient {
+  background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+  transition: all 0.3s ease;
+}
+
+.button-gradient:hover {
+  background: linear-gradient(90deg, #7c3aed, #8b5cf6);
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.25);
+}
+
+.shadow-soft {
+  box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.1), 0 10px 10px -5px rgba(139, 92, 246, 0.04);
+}
+
+.glow {
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+}
+
+.glow:hover {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+}
+
+.blob {
+  border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+  animation: morph 5s linear infinite;
+}
+
+.blob-static {
+  border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+}
+
+@keyframes morph {
+  0% {
+    border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+  }
+  25% {
+    border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%;
+  }
+  50% {
+    border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%;
+  }
+  75% {
+    border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%;
+  }
+  100% {
+    border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+  }
+}
