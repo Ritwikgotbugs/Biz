@@ -1,8 +1,5 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import HeaderComponent from "@/components/layout/Header";
-import FooterComponent from "@/components/layout/Footer";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { downloadBusinessPlanTemplate } from "@/utils/downloadUtils";
@@ -17,7 +14,8 @@ import {
   Calendar,
   TrendingUp,
   BadgeIndianRupee,
-  LibraryBig
+  LibraryBig,
+  ClipboardList
 } from "lucide-react";
 
 import TaxCalculator from "@/components/resources/TaxCalculator";
@@ -73,8 +71,6 @@ const ResourcesPage = () => {
   
   return (
     <div className="flex flex-col min-h-screen">
-      <HeaderComponent />
-      
       <main className="flex-1 bg-gray-50">
         <div className="bg-primary text-white py-12 px-4">
           <div className="container mx-auto max-w-4xl text-center">
@@ -85,107 +81,114 @@ const ResourcesPage = () => {
           </div>
         </div>
         
-        <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="container mx-auto max-w-6xl px-4 py-12 space-y-12">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
             <div className="bg-white rounded-lg p-1 border shadow-sm">
-              <TabsList className="grid grid-cols-1 md:grid-cols-3 w-full">
-                <TabsTrigger value="tax-calculator" className="flex gap-2 py-3">
-                  <Calculator className="h-5 w-5" />
-                  <span>Tax Calculator</span>
+              <TabsList className="grid grid-cols-1 sm:grid-cols-3 w-full h-auto">
+                <TabsTrigger 
+                  value="tax-calculator" 
+                  className="flex items-center justify-center gap-2 py-3 px-4 data-[state=active]:bg-primary data-[state=active]:text-white"
+                >
+                  <Calculator className="h-5 w-5 shrink-0" />
+                  <span className="whitespace-nowrap">Tax Calculator</span>
                 </TabsTrigger>
-                <TabsTrigger value="compliance-guide" className="flex gap-2 py-3">
-                  <ListChecks className="h-5 w-5" />
-                  <span>Compliance Guide</span>
+                <TabsTrigger 
+                  value="compliance-guide" 
+                  className="flex items-center justify-center gap-2 py-3 px-4 data-[state=active]:bg-primary data-[state=active]:text-white"
+                >
+                  <ListChecks className="h-5 w-5 shrink-0" />
+                  <span className="whitespace-nowrap">Compliance Guide</span>
                 </TabsTrigger>
-                <TabsTrigger value="articles" className="flex gap-2 py-3">
-                  <BookOpen className="h-5 w-5" />
-                  <span>Articles & Blog</span>
+                <TabsTrigger 
+                  value="articles" 
+                  className="flex items-center justify-center gap-2 py-3 px-4 data-[state=active]:bg-primary data-[state=active]:text-white"
+                >
+                  <BookOpen className="h-5 w-5 shrink-0" />
+                  <span className="whitespace-nowrap">Articles & Blog</span>
                 </TabsTrigger>
               </TabsList>
             </div>
             
-            <TabsContent value="tax-calculator">
+            <TabsContent value="tax-calculator" className="mt-8">
               <TaxCalculator />
             </TabsContent>
             
-            <TabsContent value="compliance-guide">
+            <TabsContent value="compliance-guide" className="mt-8">
               <ComplianceGuide />
             </TabsContent>
             
-            <TabsContent value="articles">
+            <TabsContent value="articles" className="mt-8">
               <BlogArticles />
             </TabsContent>
           </Tabs>
 
           {/* Download Resources Section */}
-          <section className="mt-12">
-            <div className="bg-white rounded-lg border shadow-sm p-6">
-              <h2 className="text-2xl font-bold mb-6">Download Resources</h2>
+          <section className="space-y-8">
+            <div className="bg-white rounded-lg border shadow-sm p-8">
+              <h2 className="text-2xl font-bold mb-8">Download Resources</h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="border rounded-lg p-5 hover:shadow-md transition-shadow">
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="p-2 bg-blue-100 rounded-md text-blue-600">
-                      <FileText className="h-5 w-5" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="border rounded-lg p-6 hover:shadow-md transition-shadow bg-white">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="p-3 bg-blue-100 rounded-lg text-blue-600">
+                      <FileText className="h-6 w-6" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Business Plan Template</h3>
+                      <h3 className="font-semibold text-lg">Business Plan Template</h3>
                       <p className="text-sm text-muted-foreground">Comprehensive template for your startup</p>
                     </div>
                   </div>
-                  <p className="text-sm mb-4">
+                  <p className="text-sm text-muted-foreground mb-6">
                     A detailed business plan template tailored for Indian startups with sections for market analysis, financials, and compliance.
                   </p>
-                  <AuthButton onClick={handleTemplateDownload}>
-                    <Download className="h-4 w-4" /> Download Template
+                  <AuthButton onClick={handleTemplateDownload} className="w-full">
+                    <Download className="h-4 w-4 mr-2" /> Download Template
                   </AuthButton>
                 </div>
                 
-                <div className="border rounded-lg p-5 hover:shadow-md transition-shadow">
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="p-2 bg-green-100 rounded-md text-green-600">
-                      <Calendar className="h-5 w-5" />
+                <div className="border rounded-lg p-6 hover:shadow-md transition-shadow bg-white">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="p-3 bg-green-100 rounded-lg text-green-600">
+                      <ClipboardList className="h-6 w-6" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Compliance Calendar</h3>
-                      <p className="text-sm text-muted-foreground">Annual filing dates and deadlines</p>
+                      <h3 className="font-semibold text-lg">Compliance Checklist</h3>
+                      <p className="text-sm text-muted-foreground">Sector-specific requirements</p>
                     </div>
                   </div>
-                  <p className="text-sm mb-4">
-                    Keep track of important compliance deadlines like GST filing, income tax, and annual returns.
+                  <p className="text-sm text-muted-foreground mb-6">
+                    Detailed compliance checklists for different business sectors with regulatory requirements and deadlines.
                   </p>
                   <AuthButton onClick={() => {
-                    // In a real app, this would download a calendar file
                     toast({
                       title: "Feature Coming Soon",
                       description: "This feature will be available soon.",
                     });
-                  }}>
-                    <Download className="h-4 w-4" /> Download Calendar
+                  }} className="w-full">
+                    <Download className="h-4 w-4 mr-2" /> Download Checklist
                   </AuthButton>
                 </div>
                 
-                <div className="border rounded-lg p-5 hover:shadow-md transition-shadow">
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="p-2 bg-purple-100 rounded-md text-purple-600">
-                      <TrendingUp className="h-5 w-5" />
+                <div className="border rounded-lg p-6 hover:shadow-md transition-shadow bg-white">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="p-3 bg-purple-100 rounded-lg text-purple-600">
+                      <TrendingUp className="h-6 w-6" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Market Analysis Reports</h3>
+                      <h3 className="font-semibold text-lg">Market Analysis Reports</h3>
                       <p className="text-sm text-muted-foreground">Industry insights and trends</p>
                     </div>
                   </div>
-                  <p className="text-sm mb-4">
+                  <p className="text-sm text-muted-foreground mb-6">
                     Detailed market analysis reports for major industry sectors in India including growth projections.
                   </p>
                   <AuthButton onClick={() => {
-                    // In a real app, this would download a report
                     toast({
                       title: "Feature Coming Soon",
                       description: "This feature will be available soon.",
                     });
-                  }}>
-                    <Download className="h-4 w-4" /> Download Reports
+                  }} className="w-full">
+                    <Download className="h-4 w-4 mr-2" /> Download Reports
                   </AuthButton>
                 </div>
               </div>
@@ -193,75 +196,75 @@ const ResourcesPage = () => {
           </section>
           
           {/* External Resources Section */}
-          <section className="mt-12 mb-12">
-            <div className="bg-white rounded-lg border shadow-sm p-6">
-              <h2 className="text-2xl font-bold mb-6">External Resources</h2>
+          <section className="space-y-8">
+            <div className="bg-white rounded-lg border shadow-sm p-8">
+              <h2 className="text-2xl font-bold mb-8">External Resources</h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="border rounded-lg p-5 hover:shadow-md transition-shadow">
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="p-2 bg-amber-100 rounded-md text-amber-600">
-                      <BadgeIndianRupee className="h-5 w-5" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="border rounded-lg p-6 hover:shadow-md transition-shadow bg-white">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="p-3 bg-amber-100 rounded-lg text-amber-600">
+                      <BadgeIndianRupee className="h-6 w-6" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Startup India</h3>
+                      <h3 className="font-semibold text-lg">Startup India</h3>
                       <p className="text-sm text-muted-foreground">Government Initiative</p>
                     </div>
                   </div>
-                  <p className="text-sm mb-4">
+                  <p className="text-sm text-muted-foreground mb-6">
                     Access benefits, incentives and resources from the Startup India government initiative.
                   </p>
                   <a 
                     href="https://www.startupindia.gov.in/" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-primary hover:underline"
+                    className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
                   >
                     Visit Website <ExternalLink className="h-4 w-4" />
                   </a>
                 </div>
                 
-                <div className="border rounded-lg p-5 hover:shadow-md transition-shadow">
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="p-2 bg-red-100 rounded-md text-red-600">
-                      <LibraryBig className="h-5 w-5" />
+                <div className="border rounded-lg p-6 hover:shadow-md transition-shadow bg-white">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="p-3 bg-red-100 rounded-lg text-red-600">
+                      <LibraryBig className="h-6 w-6" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Ministry of Corporate Affairs</h3>
+                      <h3 className="font-semibold text-lg">Ministry of Corporate Affairs</h3>
                       <p className="text-sm text-muted-foreground">Government Portal</p>
                     </div>
                   </div>
-                  <p className="text-sm mb-4">
+                  <p className="text-sm text-muted-foreground mb-6">
                     Official resource for company registration, filing returns and regulatory compliance.
                   </p>
                   <a 
                     href="https://www.mca.gov.in/" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-primary hover:underline"
+                    className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
                   >
                     Visit Website <ExternalLink className="h-4 w-4" />
                   </a>
                 </div>
                 
-                <div className="border rounded-lg p-5 hover:shadow-md transition-shadow">
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="p-2 bg-teal-100 rounded-md text-teal-600">
-                      <CheckCircle2 className="h-5 w-5" />
+                <div className="border rounded-lg p-6 hover:shadow-md transition-shadow bg-white">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="p-3 bg-teal-100 rounded-lg text-teal-600">
+                      <CheckCircle2 className="h-6 w-6" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">DPIIT</h3>
+                      <h3 className="font-semibold text-lg">DPIIT</h3>
                       <p className="text-sm text-muted-foreground">Department for Promotion of Industry and Internal Trade</p>
                     </div>
                   </div>
-                  <p className="text-sm mb-4">
+                  <p className="text-sm text-muted-foreground mb-6">
                     Get information about policies, funding opportunities and startup recognition.
                   </p>
                   <a 
                     href="https://dpiit.gov.in/" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-primary hover:underline"
+                    className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
                   >
                     Visit Website <ExternalLink className="h-4 w-4" />
                   </a>
@@ -271,8 +274,6 @@ const ResourcesPage = () => {
           </section>
         </div>
       </main>
-      
-      <FooterComponent />
     </div>
   );
 };

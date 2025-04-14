@@ -1,12 +1,13 @@
-
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { generateSectorComplianceChecklist } from "@/utils/downloadUtils";
 import { toast } from "@/hooks/use-toast";
 import { getUserProfile } from "@/lib/supabase";
-import { FileText, Download, LucideIcon, Search, CodeIcon, Briefcase, Building2, Utensils, Stethoscope, Film, Factory } from "lucide-react";
+import { FileText, Download, LucideIcon, Search, CodeIcon, Briefcase, Building2, Utensils, Stethoscope, Film, Factory, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 
 interface SectorContent {
   id: string;
@@ -215,11 +216,13 @@ const SectorKnowledgeBase: React.FC = () => {
   const [selectedSector, setSelectedSector] = useState("technology");
   const [searchQuery, setSearchQuery] = useState("");
   const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadingResource, setDownloadingResource] = useState<string | null>(null);
   
   const sector = sectorContent.find(s => s.id === selectedSector);
   
   const handleDownload = async (resourceTitle: string) => {
     setIsDownloading(true);
+    setDownloadingResource(resourceTitle);
     
     try {
       const userProfile = await getUserProfile();
@@ -247,6 +250,7 @@ const SectorKnowledgeBase: React.FC = () => {
       });
     } finally {
       setIsDownloading(false);
+      setDownloadingResource(null);
     }
   };
   
@@ -256,41 +260,64 @@ const SectorKnowledgeBase: React.FC = () => {
     resource.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
   
+  // Get badge color based on resource type
+  const getBadgeVariant = (type: string) => {
+    switch(type) {
+      case 'guide': return 'default';
+      case 'checklist': return 'success';
+      case 'template': return 'secondary';
+      case 'report': return 'outline';
+      default: return 'default';
+    }
+  };
+  
   return (
-    <div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Sector-Specific Knowledge Base</CardTitle>
+    <div className="space-y-6">
+      <Card className="border-none shadow-md">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-2xl">Sector-Specific Knowledge Base</CardTitle>
+          <CardDescription>
+            Access industry-specific resources, guides, and compliance checklists for your business sector
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-6">
-            <Tabs value={selectedSector} onValueChange={setSelectedSector}>
-              <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 mb-4">
-                {sectorContent.map(sector => (
-                  <TabsTrigger key={sector.id} value={sector.id} className="flex flex-col gap-1 py-2">
-                    <sector.icon className="h-5 w-5" />
-                    <span className="text-xs">{sector.label}</span>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              
-              <div className="relative mb-6">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Search resources..."
-                  className="w-full rounded-md border border-input pl-10 py-2 bg-background"
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                />
+            <Tabs value={selectedSector} onValueChange={setSelectedSector} className="w-full">
+              <div className="flex flex-col space-y-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Search resources..."
+                    className="w-full pl-10 py-2 bg-background"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                
+                <TabsList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 h-auto p-1 bg-muted/50">
+                  {sectorContent.map(sector => (
+                    <TabsTrigger 
+                      key={sector.id} 
+                      value={sector.id} 
+                      className="flex flex-col gap-1 py-3 px-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                    >
+                      <sector.icon className="h-5 w-5" />
+                      <span className="text-xs font-medium">{sector.label}</span>
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
               </div>
               
               {sectorContent.map(sector => (
-                <TabsContent key={sector.id} value={sector.id}>
+                <TabsContent key={sector.id} value={sector.id} className="mt-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {filteredResources && filteredResources.length > 0 ? (
                       filteredResources.map((resource, index) => (
-                        <div key={index} className="border rounded-lg p-5 hover:shadow-md transition-shadow">
+                        <div 
+                          key={index} 
+                          className="border rounded-lg p-5 hover:shadow-md transition-all duration-200 bg-card"
+                        >
                           <div className="flex items-start gap-3 mb-3">
                             <div className={`p-2 rounded-md ${
                               resource.type === 'guide' ? 'bg-blue-100 text-blue-600' :
@@ -300,29 +327,49 @@ const SectorKnowledgeBase: React.FC = () => {
                             }`}>
                               <FileText className="h-5 w-5" />
                             </div>
-                            <div>
-                              <h3 className="font-semibold">{resource.title}</h3>
-                              <p className="text-xs text-muted-foreground capitalize">{resource.type}</p>
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-lg">{resource.title}</h3>
+                              <Badge variant={getBadgeVariant(resource.type)} className="mt-1 capitalize">
+                                {resource.type}
+                              </Badge>
                             </div>
                           </div>
-                          <p className="text-sm mb-4">
+                          <p className="text-sm text-muted-foreground mb-4">
                             {resource.description}
                           </p>
                           <Button 
                             variant="outline" 
                             size="sm" 
-                            className="flex items-center gap-1"
+                            className="flex items-center gap-1 w-full justify-center"
                             onClick={() => handleDownload(resource.title)}
                             disabled={isDownloading}
                           >
-                            <Download className="h-4 w-4" /> 
-                            {isDownloading ? "Downloading..." : "Download"}
+                            {downloadingResource === resource.title ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Downloading...
+                              </>
+                            ) : (
+                              <>
+                                <Download className="h-4 w-4 mr-2" /> 
+                                Download
+                              </>
+                            )}
                           </Button>
                         </div>
                       ))
                     ) : (
-                      <div className="col-span-2 text-center py-10 border rounded-lg bg-slate-50">
+                      <div className="col-span-2 text-center py-10 border rounded-lg bg-muted/30">
+                        <Search className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
                         <p className="text-muted-foreground">No resources found matching your search.</p>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="mt-3"
+                          onClick={() => setSearchQuery("")}
+                        >
+                          Clear search
+                        </Button>
                       </div>
                     )}
                   </div>
