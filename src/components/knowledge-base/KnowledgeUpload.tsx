@@ -1,9 +1,8 @@
-
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { saveKnowledgeDocument } from "@/lib/supabase";
-import { Upload, FileCheck, AlertCircle } from "lucide-react";
+import { Upload, FileCheck, AlertCircle, X } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 interface KnowledgeUploadProps {
@@ -21,6 +20,16 @@ const KnowledgeUpload: React.FC<KnowledgeUploadProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileDetails, setFileDetails] = useState<any>(null);
   const { isAuthenticated } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Reset file input when component unmounts
+  useEffect(() => {
+    return () => {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    };
+  }, []);
 
   const allowedFileTypes = [
     'application/pdf',
@@ -100,6 +109,11 @@ const KnowledgeUpload: React.FC<KnowledgeUploadProps> = ({
       setSelectedFile(null);
       setFileDetails(null);
       
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      
       // Trigger callback if provided
       if (onUploadComplete) {
         onUploadComplete();
@@ -114,6 +128,21 @@ const KnowledgeUpload: React.FC<KnowledgeUploadProps> = ({
       });
     } finally {
       setIsUploading(false);
+    }
+  };
+  
+  const handleFileSelect = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''; // Clear the input first
+      fileInputRef.current.click();
+    }
+  };
+  
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    setFileDetails(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
   
@@ -139,10 +168,12 @@ const KnowledgeUpload: React.FC<KnowledgeUploadProps> = ({
             <div className="flex gap-3 justify-center">
               <Button 
                 variant="outline" 
-                onClick={() => { setSelectedFile(null); setFileDetails(null); }}
+                onClick={handleRemoveFile}
                 disabled={isUploading}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
               >
-                Change File
+                <X className="h-4 w-4 mr-2" />
+                Remove
               </Button>
               <Button 
                 onClick={handleUpload}
@@ -172,6 +203,7 @@ const KnowledgeUpload: React.FC<KnowledgeUploadProps> = ({
             </div>
             
             <input
+              ref={fileInputRef}
               type="file"
               id="file-upload"
               className="hidden"
@@ -182,7 +214,6 @@ const KnowledgeUpload: React.FC<KnowledgeUploadProps> = ({
               <Button 
                 variant="outline" 
                 className="cursor-pointer" 
-                onClick={() => document.getElementById('file-upload')?.click()}
                 asChild
               >
                 <span>{buttonLabel}</span>

@@ -1,7 +1,6 @@
-
 import { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Send, Paperclip, Bot, User } from "lucide-react";
+import { Send, Paperclip, Bot, User, Image, File, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import LoadingDots from "@/components/ui/loading-dots";
+import { Badge } from "@/components/ui/badge";
 
 // Message type
 interface Message {
@@ -16,6 +16,16 @@ interface Message {
   content: string;
   role: "user" | "bot";
   timestamp: Date;
+  attachments?: Attachment[];
+}
+
+// Attachment type
+interface Attachment {
+  id: string;
+  name: string;
+  type: string;
+  size: string;
+  url?: string;
 }
 
 // Mock data service for chat
@@ -57,11 +67,13 @@ const ChatInterface = () => {
     }
   ]);
   const [isFirstMessage, setIsFirstMessage] = useState(true);
-  const [userUploads, setUserUploads] = useState([]);
+  const [userUploads, setUserUploads] = useState<Attachment[]>([]);
   const [isSending, setIsSending] = useState(false);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
   const endOfMessagesRef = useRef<HTMLDivElement | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const preventAutoScroll = useRef(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Fetch knowledge base data
   const { data: knowledgeData, isLoading: isLoadingKnowledge } = useQuery({
@@ -83,42 +95,71 @@ const ChatInterface = () => {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      // In a real app, you'd upload this file to your backend
-      toast.success(`"${file.name}" added to your knowledge base`);
       
-      // Mock adding to uploads
-      setUserUploads((prev: any) => [...prev, {
+      // Check file size (10MB limit)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("File size exceeds 10MB limit");
+        return;
+      }
+      
+      // Create attachment object
+      const newAttachment: Attachment = {
         id: Date.now().toString(),
         name: file.name,
-        size: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
-        type: file.type
-      }]);
+        type: file.type,
+        size: formatFileSize(file.size)
+      };
+      
+      // Add to attachments
+      setAttachments(prev => [...prev, newAttachment]);
+      
+      // In a real app, you'd upload this file to your backend
+      toast.success(`"${file.name}" added to your message`);
+      
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
+  };
+
+  // Format file size
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + ' B';
+    else if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
+    else return (bytes / 1048576).toFixed(2) + ' MB';
+  };
+
+  // Remove attachment
+  const removeAttachment = (id: string) => {
+    setAttachments(prev => prev.filter(attachment => attachment.id !== id));
   };
 
   // Handle sending a message
   const handleSendMessage = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() && attachments.length === 0) return;
     
-    const userMessage = {
+    const userMessage: Message = {
       id: Date.now().toString(),
       content: input.trim(),
-      role: "user" as const,
-      timestamp: new Date()
+      role: "user",
+      timestamp: new Date(),
+      attachments: attachments.length > 0 ? [...attachments] : undefined
     };
     
     setMessages(prev => [...prev, userMessage]);
     setInput("");
+    setAttachments([]);
     setIsSending(true);
     
     try {
       // Show typing indicator with loading state
       const response = await ChatService.askQuestion(input, userUploads);
       
-      const botMessage = {
+      const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: response,
-        role: "bot" as const,
+        role: "bot",
         timestamp: new Date()
       };
       
@@ -143,7 +184,7 @@ const ChatInterface = () => {
 
   // Scroll to bottom when messages change
   useEffect(() => {
-    if (!preventAutoScroll.current && endOfMessagesRef.current) {
+    if (!preventAutoScroll.current && endOfMessagesRef.current && messages.length > 1) {
       endOfMessagesRef.current.scrollIntoView({ behavior: "smooth" });
     }
     preventAutoScroll.current = false;
@@ -165,29 +206,6 @@ const ChatInterface = () => {
         <div className="flex items-center gap-2">
           <Bot className="h-6 w-6" />
           <h2 className="text-lg font-semibold">StartKaro Assistant</h2>
-        </div>
-        <div>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-white hover:bg-primary-foreground/10">
-                  <label htmlFor="file-upload" className="cursor-pointer">
-                    <Paperclip className="h-5 w-5" />
-                    <input
-                      id="file-upload"
-                      type="file"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                      accept=".pdf,.doc,.docx,.txt"
-                    />
-                  </label>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Upload documents to your knowledge base</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
         </div>
       </div>
 
@@ -224,6 +242,22 @@ const ChatInterface = () => {
                 </div>
                 <div className="space-y-2">
                   <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  
+                  {/* Display attachments if any */}
+                  {message.attachments && message.attachments.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {message.attachments.map((attachment) => (
+                        <div 
+                          key={attachment.id} 
+                          className="flex items-center gap-2 bg-white/10 p-2 rounded-md"
+                        >
+                          <File className="h-4 w-4" />
+                          <span className="text-xs truncate">{attachment.name}</span>
+                          <span className="text-xs opacity-70">{attachment.size}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -247,6 +281,28 @@ const ChatInterface = () => {
 
       {/* Input area for user messages */}
       <div className="p-4 border-t">
+        {/* Display selected attachments */}
+        {attachments.length > 0 && (
+          <div className="mb-2 flex flex-wrap gap-2">
+            {attachments.map((attachment) => (
+              <Badge 
+                key={attachment.id} 
+                variant="secondary" 
+                className="flex items-center gap-1"
+              >
+                <File className="h-3 w-3" />
+                <span className="text-xs truncate max-w-[150px]">{attachment.name}</span>
+                <button 
+                  onClick={() => removeAttachment(attachment.id)}
+                  className="ml-1 hover:text-destructive"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+          </div>
+        )}
+        
         <div className="flex gap-2">
           <Textarea
             value={input}
@@ -256,13 +312,40 @@ const ChatInterface = () => {
             className="resize-none"
             rows={2}
           />
-          <Button
-            onClick={handleSendMessage}
-            disabled={!input.trim() || isSending}
-            className="self-end"
-          >
-            <Send className="h-5 w-5" />
-          </Button>
+          <div className="flex flex-col gap-2 self-end">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="h-10 w-10"
+                  >
+                    <Paperclip className="h-4 w-4" />
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                      accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                    />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Attach a file</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            
+            <Button
+              onClick={handleSendMessage}
+              disabled={(!input.trim() && attachments.length === 0) || isSending}
+              className="h-10 w-10"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         <p className="text-xs text-muted-foreground mt-2">
           Your chatbot is connected to your personal knowledge base and will provide personalized guidance based on your business information.

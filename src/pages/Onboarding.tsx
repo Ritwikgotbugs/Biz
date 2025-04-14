@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -250,20 +249,6 @@ const OnboardingPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b">
-        <div className="container mx-auto py-4 px-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-primary">
-              Start<span className="text-gradient">Karo</span>
-            </h1>
-            <span className="text-muted-foreground text-sm">Onboarding</span>
-          </div>
-          <div className="text-sm text-muted-foreground">
-            Need help? <a href="#" className="text-primary">Contact Support</a>
-          </div>
-        </div>
-      </header>
-      
       <main className="flex-1 container mx-auto px-4 py-8 max-w-3xl">
         <Card className="border-0 shadow-lg">
           <CardHeader className="pb-3">

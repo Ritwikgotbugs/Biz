@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { generateComplianceReport } from "@/utils/downloadUtils";
 import { getUserProfile, getChecklistItems } from "@/lib/supabase";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SectorComplianceMap {
   [key: string]: string[];
@@ -63,6 +66,8 @@ const ComplianceReport: React.FC<ComplianceReportProps> = ({
   const [userProfile, setUserProfile] = useState<any>({});
   const [userChecklist, setUserChecklist] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Load user profile from Supabase or localStorage
   useEffect(() => {
@@ -117,6 +122,22 @@ const ComplianceReport: React.FC<ComplianceReportProps> = ({
   
   // All combined compliance requirements
   const allRequirements = [...businessRequirements, ...sectorRequirements];
+  
+  // Filter requirements based on selected category
+  const filteredRequirements = selectedCategory === "all" 
+    ? allRequirements 
+    : allRequirements.filter(req => {
+        if (selectedCategory === "business") {
+          return businessRequirements.includes(req);
+        } else if (selectedCategory === "sector") {
+          return sectorRequirements.includes(req);
+        } else if (selectedCategory === "tax") {
+          return req.includes("Tax") || req.includes("GST");
+        } else if (selectedCategory === "legal") {
+          return req.includes("Registration") || req.includes("License") || req.includes("Act");
+        }
+        return true;
+      });
   
   // Handle report download
   const handleDownload = async () => {
@@ -203,62 +224,93 @@ const ComplianceReport: React.FC<ComplianceReportProps> = ({
   
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Compliance Report</CardTitle>
-        <CardDescription>
-          Required compliances for your {mappedBusinessType} in the {mappedSector} sector
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium">Required Registrations & Licenses</h4>
-            <ul className="text-sm space-y-1 pl-5 list-disc">
-              {allRequirements.slice(0, 8).map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
-              {allRequirements.length > 8 && (
-                <li className="text-muted-foreground">+{allRequirements.length - 8} more</li>
-              )}
-            </ul>
+      <CardHeader 
+        className="cursor-pointer" 
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Compliance Report</CardTitle>
+            <CardDescription>
+              Required compliances for your {mappedBusinessType} in the {mappedSector} sector
+            </CardDescription>
           </div>
-          
-          <div className="grid grid-cols-2 gap-2 text-sm pt-2 border-t">
-            <div className="text-muted-foreground">Business Type:</div>
-            <div className="font-medium">{mappedBusinessType}</div>
-            
-            <div className="text-muted-foreground">Sector:</div>
-            <div className="font-medium">{mappedSector}</div>
-            
-            <div className="text-muted-foreground">Location:</div>
-            <div className="font-medium">{userProfile.registrationState || "Karnataka"}</div>
-            
-            <div className="text-muted-foreground">Turnover Range:</div>
-            <div className="font-medium">
-              {userProfile.annualTurnover === "under_40l" ? "Under ₹40 lakhs" :
-               userProfile.annualTurnover === "40l_to_1cr" ? "₹40 lakhs to ₹1 crore" :
-               userProfile.annualTurnover === "1cr_to_5cr" ? "₹1 crore to ₹5 crore" :
-               userProfile.annualTurnover === "above_5cr" ? "Above ₹5 crore" :
-               userProfile.annualTurnover || "Under ₹40 lakhs"}
-            </div>
-            
-            <div className="text-muted-foreground">Incorporation Date:</div>
-            <div className="font-medium">{userProfile.incorporationDate || "Not specified"}</div>
-            
-            <div className="text-muted-foreground">Company Name:</div>
-            <div className="font-medium">{userProfile.companyName || "Your Company"}</div>
+          <div className="flex items-center">
+            {isExpanded ? (
+              <ChevronUp className="h-5 w-5 text-muted-foreground" />
+            ) : (
+              <ChevronDown className="h-5 w-5 text-muted-foreground" />
+            )}
           </div>
         </div>
-      </CardContent>
-      <CardFooter>
-        <Button 
-          className="w-full"
-          onClick={handleDownload}
-          disabled={downloading}
-        >
-          {downloading ? "Downloading..." : "Download Detailed Report"}
-        </Button>
-      </CardFooter>
+      </CardHeader>
+      <div className={cn(
+        "overflow-hidden transition-all duration-300",
+        isExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+      )}>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-medium">Required Registrations & Licenses</h4>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-[180px] h-8 text-[10px]">
+                  <SelectValue placeholder="Filter by category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Requirements</SelectItem>
+                  <SelectItem value="business">Business Type</SelectItem>
+                  <SelectItem value="sector">Sector Specific</SelectItem>
+                  <SelectItem value="tax">Tax Related</SelectItem>
+                  <SelectItem value="legal">Legal & Registration</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <ul className="text-sm space-y-1 pl-5 list-disc">
+              {filteredRequirements.slice(0, 8).map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
+              {filteredRequirements.length > 8 && (
+                <li className="text-muted-foreground">+{filteredRequirements.length - 8} more</li>
+              )}
+            </ul>
+            
+            <div className="grid grid-cols-2 gap-2 mt-4">
+              <div className="text-muted-foreground">Business Type:</div>
+              <div className="font-medium">{mappedBusinessType}</div>
+              
+              <div className="text-muted-foreground">Sector:</div>
+              <div className="font-medium">{mappedSector}</div>
+              
+              <div className="text-muted-foreground">Location:</div>
+              <div className="font-medium">{userProfile.registrationState || "Karnataka"}</div>
+              
+              <div className="text-muted-foreground">Turnover Range:</div>
+              <div className="font-medium">
+                {userProfile.annualTurnover === "under_40l" ? "Under ₹40 lakhs" :
+                 userProfile.annualTurnover === "40l_to_1cr" ? "₹40 lakhs to ₹1 crore" :
+                 userProfile.annualTurnover === "1cr_to_5cr" ? "₹1 crore to ₹5 crore" :
+                 userProfile.annualTurnover === "above_5cr" ? "Above ₹5 crore" :
+                 userProfile.annualTurnover || "Under ₹40 lakhs"}
+              </div>
+              
+              <div className="text-muted-foreground">Incorporation Date:</div>
+              <div className="font-medium">{userProfile.incorporationDate || "Not specified"}</div>
+              
+              <div className="text-muted-foreground">Company Name:</div>
+              <div className="font-medium">{userProfile.companyName || "Your Company"}</div>
+            </div>
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button 
+            className="w-full"
+            onClick={handleDownload}
+            disabled={downloading}
+          >
+            {downloading ? "Downloading..." : "Download Detailed Report"}
+          </Button>
+        </CardFooter>
+      </div>
     </Card>
   );
 };

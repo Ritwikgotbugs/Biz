@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -19,8 +18,6 @@ import {
   Shield,
   Zap
 } from "lucide-react";
-import HeaderComponent from "@/components/layout/Header";
-import FooterComponent from "@/components/layout/Footer";
 
 const Index = () => {
   useEffect(() => {
@@ -51,8 +48,6 @@ const Index = () => {
 
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
-      <HeaderComponent />
-      
       {/* Hero Section with Glassmorphism and Blobs */}
       <section className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-br from-primary/5 via-secondary to-accent/10">
         {/* Decorative blobs */}
@@ -77,7 +72,7 @@ const Index = () => {
                 </span>
               </div>
               
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-gradient-primary">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-gradient-primary leading-tight">
                 Launch Your Dream Startup in India with Confidence
               </h1>
               <p className="text-xl md:text-2xl mb-8 text-muted-foreground">
@@ -91,11 +86,15 @@ const Index = () => {
               transition={{ duration: 0.5, delay: 0.4 }}
               className="flex flex-col sm:flex-row justify-center gap-4"
             >
-              <Button size="lg" className="bg-primary hover:bg-primary/90 text-white gap-2 h-12 px-6 rounded-full button-glow">
-                Get Started <ArrowRight className="ml-1 h-5 w-5" />
+              <Button size="lg" className="bg-primary hover:bg-primary/90 text-white gap-2 h-12 px-6 rounded-full button-glow" asChild>
+                <Link to="/login">
+                  Get Started <ArrowRight className="ml-1 h-5 w-5" />
+                </Link>
               </Button>
-              <Button variant="outline" size="lg" className="gap-2 h-12 px-6 rounded-full border-2 border-primary/20 hover:bg-primary/5">
-                How It Works <ArrowUpRight className="ml-1 h-4 w-4" />
+              <Button variant="outline" size="lg" className="gap-2 h-12 px-6 rounded-full border-2 border-primary/20 hover:bg-primary/5" asChild>
+                <Link to="/how-it-works">
+                  How It Works <ArrowUpRight className="ml-1 h-4 w-4" />
+                </Link>
               </Button>
             </motion.div>
             
@@ -478,11 +477,8 @@ const Index = () => {
               Join thousands of founders who've simplified their startup process with StartKaro.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button size="lg" className="bg-white text-primary hover:bg-white/90 h-12 px-8 rounded-full">
-                Get Started Free
-              </Button>
-              <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10 h-12 px-8 rounded-full border-2">
-                Schedule Demo
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90 h-12 px-8 rounded-full" asChild>
+                <Link to="/login">Get Started Free</Link>
               </Button>
             </div>
             
@@ -505,8 +501,6 @@ const Index = () => {
           </motion.div>
         </div>
       </section>
-
-      <FooterComponent />
     </div>
   );
 };

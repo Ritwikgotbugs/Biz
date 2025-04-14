@@ -1,7 +1,4 @@
-
 import ChatInterface from "@/components/chatbot/ChatInterface";
-import HeaderComponent from "@/components/layout/Header";
-import FooterComponent from "@/components/layout/Footer";
 import { useLayoutEffect, useRef } from "react";
 
 const Chatbot = () => {
@@ -18,8 +15,6 @@ const Chatbot = () => {
 
   return (
     <div className="flex flex-col min-h-screen" ref={containerRef}>
-      <HeaderComponent />
-      
       <main className="flex-1 bg-gray-50">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
@@ -32,8 +27,6 @@ const Chatbot = () => {
           </div>
         </div>
       </main>
-      
-      <FooterComponent />
     </div>
   );
 };

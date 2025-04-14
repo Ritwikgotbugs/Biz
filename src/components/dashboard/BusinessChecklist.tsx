@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CheckCircle2, Circle, Clock, FileText, Download, ExternalLink } from "lucide-react";
+import { CheckCircle2, Circle, Clock, FileText, Download, ExternalLink, LayoutGrid, List } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -10,6 +10,7 @@ import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { generateSectorComplianceChecklist } from "@/utils/downloadUtils";
 import { saveChecklistItems, getChecklistItems } from "@/lib/supabase";
+import KanbanBoard from "./KanbanBoard";
 
 // Types
 interface ChecklistItem {
@@ -423,6 +424,7 @@ const BusinessChecklist = ({ onProgressChange }: BusinessChecklistProps) => {
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [view, setView] = useState<"list" | "kanban">("kanban");
   const { user } = useAuth();
 
   useEffect(() => {
@@ -578,185 +580,206 @@ const BusinessChecklist = ({ onProgressChange }: BusinessChecklistProps) => {
             <Progress value={progress} className="w-32 h-2 mr-2" />
             <span>{progress}% complete</span>
           </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex items-center gap-1"
-            onClick={handleDownloadChecklist}
-          >
-            <Download className="h-4 w-4" />
-            <span>Download</span>
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="default"
+              size="sm"
+              disabled
+            >
+              <LayoutGrid className="h-4 w-4 mr-2" />
+              
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-1"
+              onClick={handleDownloadChecklist}
+            >
+              <Download className="h-4 w-4" />
+              <span>Download</span>
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {categories.map(category => (
-            <Button
-              key={category}
-              variant={filterCategory === category ? "default" : "outline"}
-              size="sm"
-              onClick={() => setFilterCategory(category)}
-              className="text-xs h-8"
-            >
-              {category.charAt(0).toUpperCase() + category.slice(1)}
-            </Button>
-          ))}
-        </div>
-
-        <ScrollArea className="h-[500px] pr-4">
-          {Object.keys(groupedItems).length > 0 ? (
-            Object.entries(groupedItems).map(([category, items]) => (
-              <div key={category} className="mb-6">
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">{category}</h3>
-                <div className="space-y-2">
-                  {items.map(item => (
-                    <div
-                      key={item.id}
-                      className={cn(
-                        "flex items-start p-3 rounded-md border",
-                        item.completed ? "bg-muted/50 border-muted" : "bg-white"
-                      )}
-                    >
-                      <button
-                        onClick={() => toggleItemCompletion(item.id)}
-                        className="mt-1 mr-3 flex-shrink-0"
-                        aria-label={item.completed ? "Mark as incomplete" : "Mark as complete"}
-                      >
-                        {item.completed ? (
-                          <CheckCircle2 className="h-5 w-5 text-primary" />
-                        ) : (
-                          <Circle className="h-5 w-5 text-muted-foreground" />
-                        )}
-                      </button>
-                      <div className="flex-grow">
-                        <div className="flex items-start justify-between">
-                          <h4 className={cn(
-                            "font-medium",
-                            item.completed ? "line-through text-muted-foreground" : ""
-                          )}>
-                            {item.title}
-                          </h4>
-                          <div className="flex items-center ml-2">
-                            <span className={cn(
-                              "text-xs px-2 py-0.5 rounded-full",
-                              item.priority === "high" ? "bg-red-100 text-red-700" :
-                              item.priority === "medium" ? "bg-amber-100 text-amber-700" :
-                              "bg-green-100 text-green-700"
-                            )}>
-                              {item.priority}
-                            </span>
-                          </div>
-                        </div>
-                        <p className="text-sm text-muted-foreground">{item.description}</p>
-                        {item.deadline && (
-                          <div className="flex items-center mt-2 text-xs text-muted-foreground">
-                            <Clock className="h-3 w-3 mr-1" />
-                            <span>{item.deadline}</span>
-                          </div>
-                        )}
-                        <div className="flex mt-2">
-                          {item.formUrl && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-7 px-2 text-xs mr-2"
-                              asChild
-                            >
-                              <a href={item.formUrl} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="h-3 w-3 mr-1" />
-                                Form
-                              </a>
-                            </Button>
-                          )}
-                          
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-7 px-2 text-xs"
-                                onClick={() => setSelectedItem(item)}
-                              >
-                                <FileText className="h-3 w-3 mr-1" />
-                                Details
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>{selectedItem?.title}</DialogTitle>
-                                <DialogDescription>{selectedItem?.description}</DialogDescription>
-                              </DialogHeader>
-                              <div className="space-y-4 py-4">
-                                <div>
-                                  <h4 className="text-sm font-medium mb-2">Category</h4>
-                                  <p className="text-sm">{selectedItem?.category}</p>
-                                </div>
-                                <div>
-                                  <h4 className="text-sm font-medium mb-2">Priority</h4>
-                                  <div className={cn(
-                                    "inline-block text-xs px-2 py-0.5 rounded-full",
-                                    selectedItem?.priority === "high" ? "bg-red-100 text-red-700" :
-                                    selectedItem?.priority === "medium" ? "bg-amber-100 text-amber-700" :
-                                    "bg-green-100 text-green-700"
-                                  )}>
-                                    {selectedItem?.priority}
-                                  </div>
-                                </div>
-                                <div>
-                                  <h4 className="text-sm font-medium mb-2">Deadline</h4>
-                                  <p className="text-sm">{selectedItem?.deadline || "No deadline set"}</p>
-                                </div>
-                                {selectedItem?.formUrl && (
-                                  <div>
-                                    <h4 className="text-sm font-medium mb-2">Form Link</h4>
-                                    <a 
-                                      href={selectedItem.formUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer" 
-                                      className="text-sm text-primary hover:underline flex items-center"
-                                    >
-                                      <ExternalLink className="h-3 w-3 mr-2" />
-                                      Access Form
-                                    </a>
-                                  </div>
-                                )}
-                                {selectedItem?.resources && selectedItem.resources.length > 0 && (
-                                  <div>
-                                    <h4 className="text-sm font-medium mb-2">Resources</h4>
-                                    <ul className="space-y-2">
-                                      {selectedItem.resources.map((resource, index) => (
-                                        <li key={index}>
-                                          <a 
-                                            href={resource.url} 
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-sm text-primary hover:underline flex items-center"
-                                          >
-                                            <FileText className="h-3 w-3 mr-2" />
-                                            {resource.title}
-                                          </a>
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                )}
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-center py-10">
-              <p className="text-muted-foreground">No items in this category</p>
+        {view === "list" ? (
+          <>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {categories.map(category => (
+                <Button
+                  key={category}
+                  variant={filterCategory === category ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setFilterCategory(category)}
+                  className="text-xs h-8"
+                >
+                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                </Button>
+              ))}
             </div>
-          )}
-        </ScrollArea>
+
+            <ScrollArea className="h-[500px] pr-4">
+              {Object.keys(groupedItems).length > 0 ? (
+                Object.entries(groupedItems).map(([category, items]) => (
+                  <div key={category} className="mb-6">
+                    <h3 className="text-sm font-medium text-muted-foreground mb-2">{category}</h3>
+                    <div className="space-y-2">
+                      {items.map(item => (
+                        <div
+                          key={item.id}
+                          className={cn(
+                            "flex items-start p-3 rounded-md border",
+                            item.completed ? "bg-muted/50 border-muted" : "bg-white"
+                          )}
+                        >
+                          <button
+                            onClick={() => toggleItemCompletion(item.id)}
+                            className="mt-1 mr-3 flex-shrink-0"
+                            aria-label={item.completed ? "Mark as incomplete" : "Mark as complete"}
+                          >
+                            {item.completed ? (
+                              <CheckCircle2 className="h-5 w-5 text-primary" />
+                            ) : (
+                              <Circle className="h-5 w-5 text-muted-foreground" />
+                            )}
+                          </button>
+                          
+                          <div className="flex-1">
+                            <div className="flex items-start justify-between">
+                              <h4 className={cn(
+                                "font-medium",
+                                item.completed ? "line-through text-muted-foreground" : ""
+                              )}>
+                                {item.title}
+                              </h4>
+                              <div className="flex items-center ml-2">
+                                <span className={cn(
+                                  "text-xs px-2 py-0.5 rounded-full",
+                                  item.priority === "high" ? "bg-red-100 text-red-700" :
+                                  item.priority === "medium" ? "bg-amber-100 text-amber-700" :
+                                  "bg-green-100 text-green-700"
+                                )}>
+                                  {item.priority}
+                                </span>
+                              </div>
+                            </div>
+                            <p className="text-sm text-muted-foreground">{item.description}</p>
+                            {item.deadline && (
+                              <div className="flex items-center mt-2 text-xs text-muted-foreground">
+                                <Clock className="h-3 w-3 mr-1" />
+                                <span>{item.deadline}</span>
+                              </div>
+                            )}
+                            <div className="flex items-center mt-2 gap-2">
+                              {item.formUrl && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-7 px-2 text-xs mr-2"
+                                  asChild
+                                >
+                                  <a href={item.formUrl} target="_blank" rel="noopener noreferrer">
+                                    <ExternalLink className="h-3 w-3 mr-1" />
+                                    Form
+                                  </a>
+                                </Button>
+                              )}
+                              
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="h-7 px-2 text-xs"
+                                    onClick={() => setSelectedItem(item)}
+                                  >
+                                    <FileText className="h-3 w-3 mr-1" />
+                                    Details
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                  <DialogHeader>
+                                    <DialogTitle>{selectedItem?.title}</DialogTitle>
+                                    <DialogDescription>{selectedItem?.description}</DialogDescription>
+                                  </DialogHeader>
+                                  <div className="space-y-4 py-4">
+                                    <div>
+                                      <h4 className="text-sm font-medium mb-2">Category</h4>
+                                      <p className="text-sm">{selectedItem?.category}</p>
+                                    </div>
+                                    <div>
+                                      <h4 className="text-sm font-medium mb-2">Priority</h4>
+                                      <div className={cn(
+                                        "inline-block text-xs px-2 py-0.5 rounded-full",
+                                        selectedItem?.priority === "high" ? "bg-red-100 text-red-700" :
+                                        selectedItem?.priority === "medium" ? "bg-amber-100 text-amber-700" :
+                                        "bg-green-100 text-green-700"
+                                      )}>
+                                        {selectedItem?.priority}
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <h4 className="text-sm font-medium mb-2">Deadline</h4>
+                                      <p className="text-sm">{selectedItem?.deadline || "No deadline set"}</p>
+                                    </div>
+                                    {selectedItem?.formUrl && (
+                                      <div>
+                                        <h4 className="text-sm font-medium mb-2">Form Link</h4>
+                                        <a 
+                                          href={selectedItem.formUrl}
+                                          target="_blank"
+                                          rel="noopener noreferrer" 
+                                          className="text-sm text-primary hover:underline flex items-center"
+                                        >
+                                          <ExternalLink className="h-3 w-3 mr-2" />
+                                          Access Form
+                                        </a>
+                                      </div>
+                                    )}
+                                    {selectedItem?.resources && selectedItem.resources.length > 0 && (
+                                      <div>
+                                        <h4 className="text-sm font-medium mb-2">Resources</h4>
+                                        <ul className="space-y-2">
+                                          {selectedItem.resources.map((resource, index) => (
+                                            <li key={index}>
+                                              <a 
+                                                href={resource.url} 
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-sm text-primary hover:underline flex items-center"
+                                              >
+                                                <FileText className="h-3 w-3 mr-2" />
+                                                {resource.title}
+                                              </a>
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
+                                  </div>
+                                </DialogContent>
+                              </Dialog>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-10">
+                  <p className="text-muted-foreground">No items in this category</p>
+                </div>
+              )}
+            </ScrollArea>
+          </>
+        ) : (
+          <KanbanBoard 
+            checklistItems={checklistItems} 
+            onChecklistChange={setChecklistItems}
+            onProgressChange={onProgressChange} 
+          />
+        )}
       </CardContent>
     </Card>
   );

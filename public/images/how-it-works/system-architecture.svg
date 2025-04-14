@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="800" height="600" fill="#f8fafc"/>
+    
+    <!-- Title -->
+    <text x="400" y="40" font-family="Arial" font-size="24" text-anchor="middle" fill="#1e293b">StartKaro System Architecture</text>
+    
+    <!-- Frontend Layer -->
+    <rect x="50" y="80" width="700" height="120" rx="10" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+    <text x="400" y="110" font-family="Arial" font-size="18" text-anchor="middle" fill="#1e293b">Frontend Layer</text>
+    
+    <!-- Frontend Components -->
+    <rect x="100" y="130" width="150" height="50" rx="5" fill="#3b82f6" stroke="#2563eb" stroke-width="2"/>
+    <text x="175" y="160" font-family="Arial" font-size="14" text-anchor="middle" fill="white">React + TypeScript</text>
+    
+    <rect x="300" y="130" width="150" height="50" rx="5" fill="#3b82f6" stroke="#2563eb" stroke-width="2"/>
+    <text x="375" y="160" font-family="Arial" font-size="14" text-anchor="middle" fill="white">Tailwind CSS</text>
+    
+    <rect x="500" y="130" width="150" height="50" rx="5" fill="#3b82f6" stroke="#2563eb" stroke-width="2"/>
+    <text x="575" y="160" font-family="Arial" font-size="14" text-anchor="middle" fill="white">shadcn/ui</text>
+    
+    <!-- Backend Layer -->
+    <rect x="50" y="240" width="700" height="120" rx="10" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+    <text x="400" y="270" font-family="Arial" font-size="18" text-anchor="middle" fill="#1e293b">Backend Layer</text>
+    
+    <!-- Backend Components -->
+    <rect x="100" y="290" width="150" height="50" rx="5" fill="#10b981" stroke="#059669" stroke-width="2"/>
+    <text x="175" y="320" font-family="Arial" font-size="14" text-anchor="middle" fill="white">Node.js + Express</text>
+    
+    <rect x="300" y="290" width="150" height="50" rx="5" fill="#10b981" stroke="#059669" stroke-width="2"/>
+    <text x="375" y="320" font-family="Arial" font-size="14" text-anchor="middle" fill="white">MongoDB</text>
+    
+    <rect x="500" y="290" width="150" height="50" rx="5" fill="#10b981" stroke="#059669" stroke-width="2"/>
+    <text x="575" y="320" font-family="Arial" font-size="14" text-anchor="middle" fill="white">Pinecone</text>
+    
+    <!-- AI Layer -->
+    <rect x="50" y="400" width="700" height="120" rx="10" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+    <text x="400" y="430" font-family="Arial" font-size="18" text-anchor="middle" fill="#1e293b">AI &amp; Processing Layer</text>
+    
+    <!-- AI Components -->
+    <rect x="100" y="450" width="150" height="50" rx="5" fill="#8b5cf6" stroke="#7c3aed" stroke-width="2"/>
+    <text x="175" y="480" font-family="Arial" font-size="14" text-anchor="middle" fill="white">OpenAI</text>
+    
+    <rect x="300" y="450" width="150" height="50" rx="5" fill="#8b5cf6" stroke="#7c3aed" stroke-width="2"/>
+    <text x="375" y="480" font-family="Arial" font-size="14" text-anchor="middle" fill="white">OCR.space</text>
+    
+    <rect x="500" y="450" width="150" height="50" rx="5" fill="#8b5cf6" stroke="#7c3aed" stroke-width="2"/>
+    <text x="575" y="480" font-family="Arial" font-size="14" text-anchor="middle" fill="white">Vector DB</text>
+    
+    <!-- Connection Lines -->
+    <!-- Frontend to Backend -->
+    <path d="M175 180 L175 290" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5,5"/>
+    <path d="M375 180 L375 290" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5,5"/>
+    <path d="M575 180 L575 290" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5,5"/>
+    
+    <!-- Backend to AI -->
+    <path d="M175 340 L175 450" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5,5"/>
+    <path d="M375 340 L375 450" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5,5"/>
+    <path d="M575 340 L575 450" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5,5"/>
+    
+    <!-- Legend -->
+    <rect x="50" y="550" width="700" height="40" rx="5" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
+    <text x="400" y="575" font-family="Arial" font-size="12" text-anchor="middle" fill="#64748b">
+        Frontend Layer (UI/UX) &amp;gt; Backend Layer (Data Processing) &amp;gt; AI Layer (Intelligence &amp; Analysis)
+    </text>
+</svg> 
