@@ -71,7 +71,7 @@ const SideNav = ({ isCollapsed, onCollapse }: SideNavProps) => {
 
   return (
     <div 
-      className={`fixed left-0 top-0 h-full bg-gray-800 text-white z-50 
+      className={`fixed left-0 top-0 h-full bg-zinc-900 text-white z-50 
         transition-all duration-300 ease-in-out transform
         ${isCollapsed ? 'w-16' : 'w-64'}`}
       onMouseEnter={() => setIsHovered(true)}

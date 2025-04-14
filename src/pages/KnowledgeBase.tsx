@@ -245,7 +245,7 @@ const KnowledgeBase = () => {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
               {/* Main Content */}
               <div className="lg:col-span-3">
-                <KnowledgeUpload onUploadComplete={refetchDocuments} />
+                <KnowledgeUpload />
                 
                 {/* User Documents List */}
                 {isLoadingDocuments ? (
@@ -449,9 +449,7 @@ const KnowledgeBase = () => {
               
               <div className="mt-6">
                 <KnowledgeUpload 
-                  isAdminUpload={true} 
-                  onUploadComplete={refetchDocuments}
-                  buttonLabel="Upload New Admin Document"
+                  
                 />
               </div>
             </TabsContent>
