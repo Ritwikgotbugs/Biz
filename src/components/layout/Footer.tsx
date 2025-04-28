@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -10,7 +10,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Company Info */}
           <div className="space-y-3">
-            <h3 className="text-xl font-bold text-white">StartKaro</h3>
+            <h3 className="text-xl font-bold text-white">BizAarambh</h3>
             <p className="text-gray-300 text-sm">
               Your one-stop platform for all startup needs in India. Simplifying the legal and compliance journey for entrepreneurs.
             </p>
@@ -128,7 +128,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-gray-700 mt-8 pt-4 text-center text-gray-400 text-xs">
-          <p>&copy; {currentYear} StartKaro. All rights reserved.</p>
+          <p>&copy; {currentYear} BizAarambh. All rights reserved.</p>
         </div>
       </div>
     </footer>

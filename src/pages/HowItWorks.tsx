@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const HowItWorks = () => {
   return (
@@ -9,7 +9,7 @@ const HowItWorks = () => {
         {/* Header Section */}
         <section className="bg-primary text-white py-16 px-4">
           <div className="container mx-auto text-center max-w-3xl">
-            <h1 className="text-4xl font-bold mb-4">How StartKaro Works</h1>
+            <h1 className="text-4xl font-bold mb-4">How BizAarambh Works</h1>
             <p className="text-xl">
               Your all-in-one platform designed to simplify the startup journey for entrepreneurs in India
             </p>
@@ -276,7 +276,7 @@ const HowItWorks = () => {
                   <rect width="800" height="600" fill="#f8fafc"/>
                   
                   {/* Title */}
-                  <text x="400" y="40" fontFamily="Arial" fontSize="24" textAnchor="middle" fill="#1e293b">StartKaro System Architecture</text>
+                  <text x="400" y="40" fontFamily="Arial" fontSize="24" textAnchor="middle" fill="#1e293b">BizAarambh System Architecture</text>
                   
                   {/* Frontend Layer */}
                   <rect x="50" y="80" width="700" height="120" rx="10" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="2"/>
@@ -339,7 +339,7 @@ const HowItWorks = () => {
                 </svg>
               </div>
               <p className="text-sm text-center text-muted-foreground mt-4">
-                StartKaro's architecture integrates user data processing, document analysis, and AI-powered recommendations
+                BizAarambh's architecture integrates user data processing, document analysis, and AI-powered recommendations
               </p>
             </div>
           </div>
@@ -350,7 +350,7 @@ const HowItWorks = () => {
           <div className="container mx-auto max-w-3xl">
             <h2 className="text-3xl font-bold mb-4">Ready to Start Your Entrepreneurial Journey?</h2>
             <p className="text-xl mb-8">
-              Join thousands of founders who've simplified their startup process with StartKaro.
+              Join thousands of founders who've simplified their startup process with BizAarambh.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="bg-white text-primary hover:bg-gray-100">

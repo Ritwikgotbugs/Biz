@@ -1,25 +1,28 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
-import { 
-  ArrowUpRight, 
-  BarChart3, 
-  Bell, 
-  Calendar, 
-  CheckCircle2, 
-  CircleDot, 
-  Clock,
-  FileBarChart2, 
-  Users
-} from "lucide-react";
-import { format, addDays, differenceInDays } from "date-fns";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import BusinessChecklist from "@/components/dashboard/BusinessChecklist";
 import ComplianceReport from "@/components/dashboard/ComplianceReport";
 import SectorDocuments from "@/components/knowledge-base/SectorDocuments";
-import { useAuth } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { useAuth } from "@/lib/auth";
+import { getUserProfile } from "@/lib/supabase";
+import { addDays, differenceInDays, format } from "date-fns";
+import {
+    Bell,
+    Briefcase,
+    Building2,
+    Calendar,
+    CheckCircle2,
+    CircleDot,
+    Clock,
+    FileBarChart2,
+    Target,
+    TrendingUp,
+    Users,
+    Users2
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 interface DashboardDatum {
   date: string;
@@ -96,21 +99,25 @@ const upcomingDeadlines: DeadlineItem[] = [
 ];
 
 const Dashboard = () => {
+  const { category } = useParams();
   const [progressValue, setProgressValue] = useState(30);
   const [nextDeadline, setNextDeadline] = useState<DeadlineItem | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const { user } = useAuth();
   
-  const storedProfile = localStorage.getItem("userProfile");
-  const userProfile = storedProfile ? JSON.parse(storedProfile) : {
-    companyName: "TechVentures Pvt Ltd",
-    incorporationDate: "2023-06-15",
-    registrationState: "Karnataka",
-    annualTurnover: "Under ₹40 lakhs",
-    employeeCount: "5-10",
-    sector: "Technology",
-    businessType: "Private Limited Company"
-  };
-  
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      try {
+        const profile = await getUserProfile();
+        setUserProfile(profile);
+      } catch (error) {
+        console.error("Failed to load user profile:", error);
+      }
+    };
+    
+    loadUserProfile();
+  }, []);
+
   const handleProgressChange = (value: number) => {
     setProgressValue(value);
   };
@@ -152,12 +159,110 @@ const Dashboard = () => {
     }
   };
 
+  const getStageDescription = (stage: string) => {
+    switch (stage) {
+      case 'ideation':
+        return 'Focus on validating your business idea and initial planning';
+      case 'validation':
+        return 'Testing your product/service in the market and gathering feedback';
+      case 'early_growth':
+        return 'Scaling operations and establishing market presence';
+      case 'scaling':
+        return 'Expanding market reach and optimizing operations';
+      default:
+        return 'General business operations and compliance';
+    }
+  };
+
+  const getStageIcon = (stage: string) => {
+    switch (stage) {
+      case 'ideation':
+        return <Target className="h-5 w-5" />;
+      case 'validation':
+        return <Briefcase className="h-5 w-5" />;
+      case 'early_growth':
+        return <TrendingUp className="h-5 w-5" />;
+      case 'scaling':
+        return <Building2 className="h-5 w-5" />;
+      default:
+        return <Users2 className="h-5 w-5" />;
+    }
+  };
+
+  if (!userProfile) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Welcome back, {user?.user_metadata?.name || user?.email || "User"}</p>
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
+            {userProfile.companyName || "Your Startup"} Dashboard
+          </h1>
+          <div className="flex items-center gap-2 mt-2">
+            {getStageIcon(category || 'general')}
+            <p className="text-muted-foreground">
+              {getStageDescription(category || 'general')}
+            </p>
+          </div>
+        </div>
+
+        {/* Company Profile Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-gradient-to-br from-indigo-100 to-indigo-50 border-0">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center text-indigo-800">
+                <Building2 className="h-5 w-5 mr-2" />
+                Company Type
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold text-indigo-800">{userProfile.businessType}</p>
+              <p className="text-sm text-indigo-600 mt-1">{userProfile.sector} Sector</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-blue-100 to-blue-50 border-0">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center text-blue-800">
+                <Users2 className="h-5 w-5 mr-2" />
+                Team Size
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold text-blue-800">{userProfile.employeeCount}</p>
+              <p className="text-sm text-blue-600 mt-1">Current Team</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-green-100 to-green-50 border-0">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center text-green-800">
+                <TrendingUp className="h-5 w-5 mr-2" />
+                Annual Turnover
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold text-green-800">{userProfile.annualTurnover}</p>
+              <p className="text-sm text-green-600 mt-1">Current Revenue</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-purple-100 to-purple-50 border-0">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center text-purple-800">
+                <Calendar className="h-5 w-5 mr-2" />
+                Founded
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold text-purple-800">
+                {userProfile.incorporationDate ? format(new Date(userProfile.incorporationDate), 'MMM yyyy') : 'Not specified'}
+              </p>
+              <p className="text-sm text-purple-600 mt-1">Incorporation Date</p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Top row with Overall Progress, Next Deadline, and Recent Activity */}

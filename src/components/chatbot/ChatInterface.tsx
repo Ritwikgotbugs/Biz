@@ -1,14 +1,13 @@
-import { useState, useRef, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Send, Paperclip, Bot, User, Image, File, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { toast } from "sonner";
-import LoadingDots from "@/components/ui/loading-dots";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import LoadingDots from "@/components/ui/loading-dots";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useQuery } from "@tanstack/react-query";
+import { Bot, File, Paperclip, Send, User, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 // Message type
 interface Message {
@@ -1151,7 +1150,7 @@ const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      content: "Hello! I'm your StartKaro assistant. How can I help with your startup journey today?",
+      content: "Hello! I'm your BizAarambh assistant. How can I help with your startup journey today?",
       role: "bot",
       timestamp: new Date()
     }
@@ -1300,7 +1299,7 @@ const ChatInterface = () => {
       <div className="px-6 py-4 border-b flex items-center justify-between bg-primary text-white rounded-t-lg">
         <div className="flex items-center gap-2">
           <Bot className="h-6 w-6" />
-          <h2 className="text-lg font-semibold">StartKaro Assistant</h2>
+          <h2 className="text-lg font-semibold">BizAarambh Assistant</h2>
         </div>
       </div>
 

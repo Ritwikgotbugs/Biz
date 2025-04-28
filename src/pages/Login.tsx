@@ -1,26 +1,33 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/lib/auth";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [activeTab, setActiveTab] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, isOnboarded } = useAuth();
   const navigate = useNavigate();
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await signIn(email, password);
-      navigate("/dashboard");
+      if (!isOnboarded) {
+        navigate("/onboarding");
+      } else {
+        const userProfile = localStorage.getItem('userProfile');
+        const profile = userProfile ? JSON.parse(userProfile) : null;
+        const category = profile?.stage || 'general';
+        navigate(`/dashboard/${category}`);
+      }
     } catch (error) {
       toast({
         title: "Error",

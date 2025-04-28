@@ -1,28 +1,27 @@
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { 
-  ArrowRight, 
-  BookOpen, 
-  CheckCircle, 
-  FileText, 
-  LayoutDashboard, 
-  Users,
-  Sparkles,
-  ArrowUpRight,
-  Rocket,
-  MessageSquare,
-  Star,
-  Heart,
-  Shield,
-  Zap
+import {
+    ArrowRight,
+    ArrowUpRight,
+    BookOpen,
+    CheckCircle,
+    FileText,
+    Heart,
+    LayoutDashboard,
+    MessageSquare,
+    Rocket,
+    Shield,
+    Sparkles,
+    Star,
+    Zap
 } from "lucide-react";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   useEffect(() => {
     // For SEO and page title
-    document.title = "StartKaro - One Stop Platform for Indian Startup Founders";
+    document.title = "BizAarambh - One Stop Platform for Indian Startup Founders";
   }, []);
 
   const containerVariants = {
@@ -172,7 +171,7 @@ const Index = () => {
           
           <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3 animate-float">
             <div className="h-3 w-3 rounded-full bg-primary"></div>
-            <span className="text-sm font-medium">StartKaro Dashboard Preview</span>
+            <span className="text-sm font-medium">BizAarambh Dashboard Preview</span>
           </div>
         </motion.div>
       </section>
@@ -192,7 +191,7 @@ const Index = () => {
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gradient-primary">Everything You Need to Start Up</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              StartKaro simplifies the complex process of launching a startup in India with our comprehensive platform.
+              BizAarambh simplifies the complex process of launching a startup in India with our comprehensive platform.
             </p>
           </motion.div>
 
@@ -373,14 +372,14 @@ const Index = () => {
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gradient-primary">What Founders Say</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Hear from successful entrepreneurs who used StartKaro to navigate their startup journey.
+              Hear from successful entrepreneurs who used BizAarambh to navigate their startup journey.
             </p>
           </motion.div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                quote: "StartKaro simplified the complex compliance requirements for my tech startup. The personalized checklist saved me both time and legal consultation costs.",
+                quote: "BizAarambh simplified the complex compliance requirements for my tech startup. The personalized checklist saved me both time and legal consultation costs.",
                 author: "Rahul Sharma",
                 role: "Founder, TechVista Solutions",
                 image: "https://randomuser.me/api/portraits/men/32.jpg",
@@ -394,7 +393,7 @@ const Index = () => {
                 icon: <Heart className="h-5 w-5 text-pink-500" />
               },
               {
-                quote: "As a solo founder with limited resources, StartKaro's AI assistant helped me understand critical compliance requirements without expensive legal consultations.",
+                quote: "As a solo founder with limited resources, BizAarambh's AI assistant helped me understand critical compliance requirements without expensive legal consultations.",
                 author: "Vikram Singh",
                 role: "Founder, FoodTruck Network",
                 image: "https://randomuser.me/api/portraits/men/46.jpg",
@@ -474,7 +473,7 @@ const Index = () => {
             
             <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Start Your Entrepreneurial Journey?</h2>
             <p className="text-xl mb-8 text-white/80">
-              Join thousands of founders who've simplified their startup process with StartKaro.
+              Join thousands of founders who've simplified their startup process with BizAarambh.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Button size="lg" className="bg-white text-primary hover:bg-white/90 h-12 px-8 rounded-full" asChild>

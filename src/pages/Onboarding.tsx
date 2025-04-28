@@ -1,21 +1,20 @@
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth";
+import { saveUserProfile } from "@/lib/supabase";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
-import { toast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
-import { saveUserProfile } from "@/lib/supabase";
-import { useAuth } from "@/lib/auth";
 
 const sectorOptions = [
   { value: "technology", label: "Technology" },
@@ -151,7 +150,7 @@ const OnboardingPage = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const { user, setUserOnboarded } = useAuth();
+  const { user, setUserOnboarded, isOnboarded } = useAuth();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -179,6 +178,12 @@ const OnboardingPage = () => {
     },
   });
   
+  useEffect(() => {
+    if (isOnboarded) {
+      navigate('/dashboard/general');
+    }
+  }, [isOnboarded, navigate]);
+  
   const checkStepValidity = async () => {
     const currentFields = steps[currentStep].fields;
     const result = await form.trigger(currentFields as any);
@@ -196,7 +201,8 @@ const OnboardingPage = () => {
         annualTurnover: data.annualTurnover || null,
         employeeCount: data.employeeCount || null,
         sector: data.sector,
-        businessType: data.businessType
+        businessType: data.businessType,
+        stage: data.stage
       };
       
       await saveUserProfile(profileData);
@@ -204,14 +210,27 @@ const OnboardingPage = () => {
       // Set onboarded state to true both in context and localStorage
       setUserOnboarded(true);
       
+      // Determine user category based on profile data
+      let category = 'general';
+      
+      if (data.stage === 'ideation') {
+        category = 'ideation';
+      } else if (data.stage === 'validation') {
+        category = 'validation';
+      } else if (data.stage === 'early_growth') {
+        category = 'early-growth';
+      } else if (data.stage === 'scaling') {
+        category = 'scaling';
+      }
+      
       toast({
         title: "Onboarding Complete",
         description: "Your startup profile has been saved successfully.",
       });
       
-      // Use a shorter timeout to redirect quickly
+      // Redirect to category-specific dashboard
       setTimeout(() => {
-        navigate("/dashboard", { replace: true });
+        navigate(`/dashboard/${category}`, { replace: true });
       }, 500);
     } catch (error) {
       console.error("Failed to save profile:", error);
